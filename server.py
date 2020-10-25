@@ -136,7 +136,10 @@ def qiantai(s):
         if pid < 0:
             print("创建子进程失败！")
         elif pid == 0:
+            s.close()
             client(c, addr)
+        else:
+            c.close()
 
 # 接待每个用户
 def client(c,addr):
@@ -207,6 +210,9 @@ def main():
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(addr)
     s.listen(5)
+
+    # 忽略子进程信号：
+    signal.signal(signal.SIGCHLD, signal.SIG_IGN)
 
     pid = os.fork()
     if pid < 0:

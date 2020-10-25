@@ -1,8 +1,7 @@
-import pymysql
-import time
 import socket
-import os, sys
-import re
+import os
+import sys
+import getpass
 
 
 # 打印登录界面
@@ -20,10 +19,10 @@ def singup(consfd):
             return 0
 
         while True:
-            password = input("请输入密码<0返回主界面>：")
+            password = getpass.getpass("请输入密码<0返回主界面>：")
             if password == '0':
                 return 0
-            password1 = input("请重复密码：")
+            password1 = getpass.getpass("请重复密码：")
             if password == password1:
                 break
             else:
@@ -87,6 +86,7 @@ def logout(consfd):
     data = "LOGOUT"
     consfd.send(data.encode())
     datarecv = consfd.recv(1024).decode()
+    print(datarecv)
     print("成功注销！返回登录界面！")
 
 
@@ -98,16 +98,25 @@ def main():
 
     while True:
         dengLuJieMian()
-        key = input("请选择：")
-        if key == '1':
+        try:
+            key = int(input("请选择："))
+        except Exception:
+            print("输入有误，请重新输入！")
+            continue
+
+        if key not in [1, 2, 3]:
+            print("请输入正确选项：")
+            sys.stdin.flush()  # 清除缓冲区
+            continue
+        elif key == 1:
             user = login(consfd)
             if user == 0:
                 continue
-        elif key == '2':
+        elif key == 2:
             user = singup(consfd)
             if user == 0:
                 continue
-        elif key == "3":
+        elif key == 3:
             print("准备退出！")
             quit(consfd)
             os._exit(1)
